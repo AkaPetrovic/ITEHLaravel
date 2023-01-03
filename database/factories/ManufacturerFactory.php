@@ -14,7 +14,7 @@ class ManufacturerFactory extends Factory
     public function definition()
     {
         return [
-            //
+            'name' => $this->faker->unique()->randomElement(['Audi', 'Fiat', 'Opel'])
         ];
     }
 }

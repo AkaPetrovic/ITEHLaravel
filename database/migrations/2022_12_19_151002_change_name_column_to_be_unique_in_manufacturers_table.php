@@ -26,7 +26,7 @@ class ChangeNameColumnToBeUniqueInManufacturersTable extends Migration
     public function down()
     {
         Schema::table('manufacturers', function (Blueprint $table) {
-            $table->string('name', 100)->change();
+            $table->dropUnique('manufacturers_name_unique');
         });
     }
 }

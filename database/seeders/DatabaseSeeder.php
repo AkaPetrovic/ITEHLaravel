@@ -2,7 +2,11 @@
 
 namespace Database\Seeders;
 
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Seeder;
+use App\Models\User;
+use App\Models\Car;
+use App\Models\Manufacturer;
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,6 +17,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // \App\Models\User::factory(10)->create();
+        Schema::disableForeignKeyConstraints();
+
+        Car::truncate();
+        User::truncate();
+        Manufacturer::truncate();
+
+        Schema::enableForeignKeyConstraints();
+
+        User::factory(10)->create();
+        Manufacturer::factory(3)->create();
+        Car::factory(10)->create();
     }
 }

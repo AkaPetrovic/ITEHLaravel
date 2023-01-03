@@ -18,7 +18,9 @@ class CreateCarsTable extends Migration
             $table->string('model', 100);
             $table->integer('year');
             $table->timestamps();
-            $table->foreignId('manufacturer_id')->constrained();
+            $table->foreignId('manufacturer_id')->constrained()
+                                                ->onUpdate('cascade')
+                                                ->onDelete('cascade');
         });
     }
 
