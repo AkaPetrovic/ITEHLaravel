@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CarController;
+use App\Http\Controllers\API\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,8 +29,16 @@ Route::get('/users/{id}/cars', [UserController::class, 'showAllCars']);
 
 Route::get('/cars/{id}', [CarController::class, 'show']);
 
-Route::post('/cars/create', [CarController::class, 'create']);
+Route::post('/register', [AuthController::class, 'register']);
 
-Route::delete('/cars/{id}/delete', [CarController::class, 'destroy']);
+Route::post('/login', [AuthController::class, 'login']);
 
-Route::put('/cars/{id}/edit', [CarController::class, 'edit']);
+Route::group(['middleware' => ['auth:sanctum']], function(){
+    Route::delete('/cars/{id}/delete', [CarController::class, 'destroy']);
+
+    Route::post('/cars/create', [CarController::class, 'create']);
+
+    Route::put('/cars/{id}/edit', [CarController::class, 'edit']);
+
+    Route::post('/logout', [AuthController::class, 'logout']);
+});

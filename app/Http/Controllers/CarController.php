@@ -7,6 +7,7 @@ use App\Models\Manufacturer;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Resources\CarResource;
+use Illuminate\Support\Facades\Auth;
 
 class CarController extends Controller
 {
@@ -25,20 +26,27 @@ class CarController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-        $car = Car::factory()->create();
-        if(isset($car) && $car != null){
+        $manufacturerNames = array_values((array) Manufacturer::pluck('name'))[0];
+        if(!in_array($request->manufacturer, $manufacturerNames)){
             return response()->json([
-                'message' => 'Car has been created successfully',
+                'message' => 'Manufacturer name does not exist',
             ]);
         }
-        else{
-            return response()->json([
-                'message' => 'Failed',
-            ]);
-        }
-        
+        $manufacturer = Manufacturer::where('name', $request->manufacturer)->get()->first();
+
+        $car = Car::create([
+            'model_name' => $request->model_name,
+            'year' => $request->year,
+            'manufacturer_id' =>$manufacturer->id,
+            'user_id' => Auth::user()->id,
+        ]);
+
+        return response()->json([
+            'message' => 'Car has been created successfully',
+            'car' => new CarResource($car),
+        ]);
     }
 
     /**
@@ -60,9 +68,7 @@ class CarController extends Controller
      */
     public function edit(Request $request, $car_id)
     {
-        $query = $request->query();
         $manufacturerNames = array_values((array) Manufacturer::pluck('name'))[0];
-        $userNames = array_values((array) User::pluck('name'))[0];
         $carIds = array_values((array) Car::pluck('id'))[0];
 
         if(!in_array($car_id, $carIds)){
@@ -70,27 +76,25 @@ class CarController extends Controller
                 'message' => 'Car ID does not exist',
             ]);
         }
-        if(!in_array($query['manufacturer'], $manufacturerNames)){
+        if(!in_array($request->manufacturer, $manufacturerNames)){
             return response()->json([
                 'message' => 'Manufacturer name does not exist',
             ]);
         }
-        if(!in_array($query['user'], $userNames)){
-            return response()->json([
-                'message' => 'User name does not exist',
-            ]);
-        }
 
-        $manufacturer = Manufacturer::where('name', $query['manufacturer'])->get();
-        $user = User::where('name', $query['user'])->get();
+        $manufacturer = Manufacturer::where('name', $request->manufacturer)->get()->first();
+
         $car = Car::find($car_id);
-        $car->manufacturer_id = $manufacturer[0]->id;
-        $car->user_id = $user[0]->id;
-        $car->model_name = $query['model_name'];
-        $car->year = $query['year'];
+        $car->manufacturer_id = $manufacturer->id;
+        $car->user_id = Auth::user()->id;
+        $car->model_name = $request->model_name;
+        $car->year = $request->year;
+
         $car->save();
+
         return response()->json([
             'message' => 'Car updated successfully',
+            'car' => new CarResource($car),
         ]);
     }
 
@@ -120,6 +124,7 @@ class CarController extends Controller
         
         return response()->json([
             'message' => 'Car deleted successfully',
+            'car' => new CarResource($car),
         ]);
     }
 }

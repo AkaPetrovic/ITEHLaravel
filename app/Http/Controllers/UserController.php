@@ -22,7 +22,7 @@ class UserController extends Controller
 
     public function showAllCars($user_id)
     {   
-        $cars = Car::where('user_id', 2)->get();
+        $cars = Car::where('user_id', $user_id)->get();
         return $cars;
     }
 

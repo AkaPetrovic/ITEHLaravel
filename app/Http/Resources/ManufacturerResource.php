@@ -4,9 +4,9 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class CarResource extends JsonResource
+class ManufacturerResource extends JsonResource
 {
-    public static $wrap = 'car';
+    public static $wrap = 'manufacturer';
     /**
      * Transform the resource into an array.
      *
@@ -17,10 +17,7 @@ class CarResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'model_name' => $this->model_name,
-            'year' => $this->year,
-            'manufacturer' => new ManufacturerResource($this->manufacturer),
-            'user' => new UserResource($this->user),
+            'name' => $this->name,
         ];
     }
 }
